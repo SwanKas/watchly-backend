@@ -1,3 +1,3 @@
 # Watchly
-Projet Isitech de Swan KAS et Balthazar  V.
-Catalogue de films et séries
+Projet Isitech de Swan KAS et Balthazar  Vaillant
+Catalogue de suggestions de films et séries.
