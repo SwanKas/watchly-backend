@@ -1,0 +1,20 @@
+{
+  "name": "watchly",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Projet Isitech de Swan KAS et Balthazar  Vaillant\r Catalogue de films et séries.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "express": "^4.18.3",
+    "mysql2": "^3.9.2",
+    "nodemon": "^3.1.0"
+  }
+}

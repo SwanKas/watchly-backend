@@ -1,3 +1,11 @@
+@font-face {
+	font-family: 'proximaNovaMedium';
+	src: url('../police/ProximaNovaMedium.otf') format('otf');
+
+  font-family: 'proximaNovaBold';
+	src: url('../police/ProximaNovaBold.otf') format('otf'),
+}
+
 * {
   box-sizing: border-box;
 }
@@ -44,12 +52,9 @@ body.open .background {
   height: 72px;
   padding-left: 20px;
   padding-right: 72px;
-  background: #19191c;
-  color: #f9f9f9;
-}
-
-.navbar > button {
-  font-size: 28px;
+  background: #031128;
+  color: #767171;
+  border-bottom: solid 2px;
 }
 
 .navbar-logo {
@@ -69,6 +74,11 @@ body.open .background {
   background-position: center;
 }
 
+.navbar-burger:hover {
+  transform: scale(1.1);
+  transition: 0.3s;
+}
+
 body.open .navbar-burger {
   background-image: url("./assets/close.svg");
 }
@@ -76,15 +86,17 @@ body.open .navbar-burger {
 .navbar-search {
   border: 0;
   height: 40px;
-  background: #2f3339 url("assets/search.svg");
+  background: #0062f4 url("assets/search.svg");
   background-repeat: no-repeat;
   background-position: 10px 50%;
+  color : #a7a7a7;
   border: 0;
   border-radius: 6px;
   padding-left: 36px;
   width: 100%;
   font-size: 16px;
-  font-family: "Euclid Circular A";
+  background: linear-gradient(0.25turn, #051c41, #051c41, #302d2d);
+  font-family: "proximaNovaMedium",sans-serif;
 }
 
 .navbar-search::placeholder {
@@ -102,7 +114,7 @@ body.open .navbar-burger {
   gap: 32px;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: #031128;
   opacity: 0;
   visibility: hidden;
   transition: 0.5s;
@@ -116,8 +128,12 @@ body.open .menu {
 .menu > a {
   color: #f9f9f9;
   font-size: 32px;
-  font-family: "Euclid Circular A";
+  font-family: "proximaNovaMedium",sans-serif;
   text-decoration: none;
+}
+.hover-transform:hover {
+  transform: scale(1.1);
+  transition: 0.3s;
 }
 
 body.open .menu > a {
@@ -133,3 +149,19 @@ body.open .menu > a {
     opacity: 1;
   }
 }
+.auth {
+  color: #f9f9f9;
+  font-family: "proximaNovaBold",sans-serif;
+  text-decoration: none;
+  font-size: 18px;
+}
+.authLogin {
+  margin-right: 15px;
+  margin-left: 15px;
+  white-space: nowrap;
+}
+
+.auth:hover {
+  color: #767171;
+}
+
