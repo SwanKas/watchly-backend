@@ -1,9 +1,9 @@
 @font-face {
 	font-family: 'proximaNovaMedium';
-	src: url('/public/assets/fonts/ProximaNovaMedium.otf') format('otf');
+	src: url('/assets/fonts/ProximaNovaMedium.otf') format('otf');
 
   font-family: 'proximaNovaBold';
-	src: url('/public/assets/fonts/ProximaNovaBold.otf') format('otf'),
+	src: url('/assets/fonts/ProximaNovaBold.otf') format('otf'),
 }
 
 /* -----NAVBAR----*/
@@ -70,7 +70,7 @@ body.open .background {
   place-items: center;
   width: 72px;
   height: 72px;
-  background-image: url("/public/assets/menu.svg");
+  background-image: url("/assets/menu.svg");
   background-repeat: no-repeat;
   background-position: center;
 }
@@ -81,13 +81,13 @@ body.open .background {
 }
 
 body.open .navbar-burger {
-  background-image: url("/public/assets/close.svg");
+  background-image: url("/assets/close.svg");
 }
 
 .navbar-search {
   border: 0;
   height: 40px;
-  background: #0062f4 url("/public/assets/search.svg");
+  background: #0062f4 url("/assets/search.svg");
   background-repeat: no-repeat;
   background-position: 10px 50%;
   color : #a7a7a7;
@@ -134,7 +134,7 @@ body.open .menu {
 }
 .hover-transform:hover {
   transform: scale(1.1);
-  transition: 0.3s;
+  transition: 0.5s;
 }
 
 body.open .menu > a {
@@ -194,11 +194,14 @@ ul {
 }
 
 .footer {
+  z-index: 5;
   background-color: #031128;
-  padding: 70px 0;
+  padding: 30px 0;
   position : absolute;
   width: 100%;
   bottom: 0; left: 0; right: 0;
+  color: #767171;
+  border-top: solid 2px;
 }
 
 .footer-col {
