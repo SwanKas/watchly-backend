@@ -169,6 +169,8 @@ body.open .menu > a {
 /* ------- Footer */
 
 body {
+  min-height: 1500px;
+  position: relative;
   line-height: 1.5;
   font-family: 'proximaNovaMedium', sans-serif;
 }
