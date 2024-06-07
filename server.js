@@ -5,10 +5,14 @@ import expressLayouts from "express-ejs-layouts";
 import flash from "connect-flash";
 import session from "express-session";
 import passport from "passport";
-import auth from "./routes/auth.js";
-import index from "./routes/index.js";
+import auth from "./routes/authRouter.js";
+import index from "./routes/indexRouter.js";
+import movieRouter from "./routes/movieRouter.js";
+
 //Créer une application Express
 const app = express();
+
+app.use(express.json());
 
 //------------ Passport Configuration ------------//
 import configurePassport from './config/passport.js';
@@ -21,7 +25,6 @@ app.use(express.static('public'));
 dotenv.config();
 
 //Connexion à la base de données MongoDB avec Mongoose
-
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connexion à la base de données réussie.'))
   .catch(err => console.error('Erreur de connexion ', err));
@@ -67,6 +70,7 @@ app.use(function(req, res, next) {
 //------------ Routes ------------//
 app.use('/', index);
 app.use('/auth', auth);
+app.use('/', movieRouter);
 
 const PORT = process.env.PORT || 4000;
 //Ecoute du serveur sur le port 4000
