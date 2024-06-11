@@ -1,3 +1,4 @@
+<<<<<<< HEAD
  <div class="background"></div>
     <nav class="navbar">
       <img class="navbar-logo" src="/assets/logo.png" />
@@ -18,4 +19,26 @@
         document.body.classList.toggle("open");
       };
     </script>
+=======
+ <div class="background"></div>
+    <nav class="navbar">
+      <img class="navbar-logo" src="/assets/logo.png" />
+      <input type="text" placeholder="Rechercher..." class="navbar-search" />
+      <button class="authLogin auth" type="button" >Se connecter</button>
+      <button class="authSign auth" type="button">S'inscrire</button>
+    </nav>
+    <button class="navbar-burger hover-transform" onclick="toggleMenu()"></button>
+    <nav class="menu">
+  
+      <a href="#" style="animation-delay: 0.1s" class="hover-transform">Films</a>
+      <a href="#" style="animation-delay: 0.2s" class="hover-transform">Séries</a>
+      <a href="#" style="animation-delay: 0.3s" class="hover-transform">Vos listes personnalisées</a>
+      <a href="#" style="animation-delay: 0.4s" class="hover-transform" >Mon compte</a>
+    </nav>
+    <script type="text/javascript">
+      const toggleMenu = () => {
+        document.body.classList.toggle("open");
+      };
+    </script>
+>>>>>>> origin/feature/auth
     
