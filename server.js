@@ -8,9 +8,12 @@ import passport from "passport";
 import auth from "./routes/authRouter.js";
 import index from "./routes/indexRouter.js";
 import movieRouter from "./routes/movieRouter.js";
+import listRouter from "./routes/listRouter.js";
+import "./config/passportGoogle.js";
 
 //Créer une application Express
 const app = express();
+const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
 
@@ -67,11 +70,65 @@ app.use(function(req, res, next) {
   next();
 });
 
+//Google Auth 
+// use the session middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET, // session secret
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+// initialize passport and session
+app.use(passport.initialize());
+app.use(passport.session());
+
+// a view to check if the server is running properly
+app.get("/", (req, res) => {
+  res.send(`My Node.JS APP`);
+});
+
+// authetication route
+app.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    scope: ["email", "profile"],
+  })
+);
+
+// Call back route
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    access_type: "offline",
+    scope: ["email", "profile"],
+  }),
+  (req, res) => {
+    if (!req.user) {
+      res.status(400).json({ error: "Authentication failed" });
+    }
+    // return user details
+    res.status(200).json(req.user);
+  }
+);
+
+
 //------------ Routes ------------//
 app.use('/', index);
 app.use('/auth', auth);
 app.use('/', movieRouter);
+app.use('/', movieRouter);
+app.use('/', listRouter);
 
-const PORT = process.env.PORT || 4000;
 //Ecoute du serveur sur le port 4000
-app.listen(PORT, console.log(`Server running on PORT ${PORT}`));
+
+// a function to start the server  and listen to the port defined
+const start = async () => {
+  try {
+    app.listen(PORT, () => console.log(`server is running on port ${PORT}`));
+  } catch (error) {
+    console.log(error);
+  }
+};
+start();
