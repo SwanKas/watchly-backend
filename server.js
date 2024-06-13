@@ -8,6 +8,7 @@ import passport from "passport";
 import auth from "./routes/authRouter.js";
 import index from "./routes/indexRouter.js";
 import movieRouter from "./routes/movieRouter.js";
+import listRouter from "./routes/listRouter.js";
 
 //Créer une application Express
 const app = express();
@@ -71,6 +72,7 @@ app.use(function(req, res, next) {
 app.use('/', index);
 app.use('/auth', auth);
 app.use('/', movieRouter);
+app.use('/', listRouter);
 
 const PORT = process.env.PORT || 4000;
 //Ecoute du serveur sur le port 4000
