@@ -5,7 +5,6 @@ const router = express.Router();
 //------------ Importing Controllers ------------//
 import authController from '../controllers/authController.js';
 
-
 //------------ Login Route ------------//
 router.get('/login', (req, res) => res.render('login'));
 
@@ -41,5 +40,9 @@ router.post('/login', authController.loginHandle);
 
 //------------ Logout GET Handle ------------//
 router.get('/logout', authController.logoutHandle);
+
+//------------ Google Auth Handle ------------//
+router.get('/auth/google/callback', authController.googleAuthHandle);
+
 
 export default router;

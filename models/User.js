@@ -21,8 +21,19 @@ const UserSchema = new mongoose.Schema({
   resetLink: {
     type: String,
     default: ''
-  }
-}, { timestamps: true });
+  },
+  googleId: {
+    type: String,
+    default: null
+},
+googleToken: {
+    type: String,
+    default: null
+}
+}, { timestamps: true }
+);
+
+
 
 const User = mongoose.model('User', UserSchema);
 

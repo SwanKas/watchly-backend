@@ -388,6 +388,24 @@ const logoutHandle = (req, res) => {
         res.redirect('/auth/login');
     });
 }
+//------------ Google OAuth Callback ------------//
+const googleAuthHandle = (req, res, next) => {
+    passport.authenticate('google', (err, user, info) => {
+        if (err) { 
+            return next(err); 
+        }
+        if (!user) { 
+            return res.redirect('/auth/google'); 
+        }
+        req.logIn(user, (err) => {
+            if (err) { 
+                return next(err); 
+            }
+            // Redirige vers la page d'accueil après une authentification réussie
+            return res.redirect('/'); 
+        });
+    })(req, res, next);
+}
 
 export default {    
     registerHandle,
@@ -396,5 +414,6 @@ export default {
     gotoReset, 
     resetPassword, 
     loginHandle, 
-    logoutHandle 
+    logoutHandle,
+    googleAuthHandle
 };

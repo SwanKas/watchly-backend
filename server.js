@@ -8,7 +8,6 @@ import passport from "passport";
 import auth from "./routes/authRouter.js";
 import index from "./routes/indexRouter.js";
 import movieRouter from "./routes/movieRouter.js";
-import listRouter from "./routes/listRouter.js";
 import "./config/passportGoogle.js";
 
 //Créer une application Express
@@ -42,16 +41,12 @@ app.set("views", "views");
 //------------ Bodyparser Configuration ------------//
 app.use(express.urlencoded({ extended: false }))
 
-app.get("/", (req, res) => {
-    res.render("index", {});
-  });
-
 //------------ Express session Configuration ------------//
 app.use(
   session({
-      secret: 'secret',
-      resave: true,
-      saveUninitialized: true
+    secret: process.env.SESSION_SECRET, // session secret
+    resave: false,
+    saveUninitialized: false,
   })
 );
 
@@ -70,26 +65,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-//Google Auth 
-// use the session middleware
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET, // session secret
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-
-// initialize passport and session
-app.use(passport.initialize());
-app.use(passport.session());
-
-// a view to check if the server is running properly
-app.get("/", (req, res) => {
-  res.send(`My Node.JS APP`);
-});
-
-// authetication route
+// authentication route
 app.get(
   "/auth/google",
   passport.authenticate("google", {
@@ -107,19 +83,21 @@ app.get(
   (req, res) => {
     if (!req.user) {
       res.status(400).json({ error: "Authentication failed" });
+    } else {
+      // redirect to home page after successful authentication
+      res.redirect('/');
     }
-    // return user details
-    res.status(200).json(req.user);
   }
 );
 
-
 //------------ Routes ------------//
+app.get("/", (req, res) => {
+    res.render("index", {});
+});
+
 app.use('/', index);
 app.use('/auth', auth);
 app.use('/', movieRouter);
-app.use('/', movieRouter);
-app.use('/', listRouter);
 
 //Ecoute du serveur sur le port 4000
 
