@@ -9,16 +9,24 @@ import auth from "./routes/authRouter.js";
 import index from "./routes/indexRouter.js";
 import movieRouter from "./routes/movieRouter.js";
 import "./config/passportGoogle.js";
+import cors from "cors"
 
 //Créer une application Express
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
 
 //------------ Passport Configuration ------------//
-import configurePassport from './config/passport.js';
-configurePassport(passport);
+// import configurePassport from './config/passport.js';
+// configurePassport(passport);
 
 //Configuration de mon application pour qu'elle puisse servir du contenu statique
 app.use(express.static('public'));
@@ -69,7 +77,7 @@ app.use(function(req, res, next) {
 app.get(
   "/auth/google",
   passport.authenticate("google", {
-    scope: ["email", "profile"],
+    scope: ["profile", "email"],
   })
 );
 
@@ -84,8 +92,8 @@ app.get(
     if (!req.user) {
       res.status(400).json({ error: "Authentication failed" });
     } else {
-      // redirect to home page after successful authentication
-      res.redirect('/');
+      res.redirect('http://localhost:4001/');
+      //res.status(200).json({ user: req.user });
     }
   }
 );
@@ -100,8 +108,6 @@ app.use('/auth', auth);
 app.use('/', movieRouter);
 
 //Ecoute du serveur sur le port 4000
-
-// a function to start the server  and listen to the port defined
 const start = async () => {
   try {
     app.listen(PORT, () => console.log(`server is running on port ${PORT}`));
