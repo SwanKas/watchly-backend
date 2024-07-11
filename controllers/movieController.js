@@ -33,7 +33,8 @@ try {
         poster_path: film.poster_path,
         genre: film.genres,
         budget: film.budget,
-        popularity: film.popularity
+        popularity: film.popularity,
+        
     });
     await newMovie.save();
     }

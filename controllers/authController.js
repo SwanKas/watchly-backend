@@ -271,9 +271,6 @@ const resetPassword = async (req, res) => {
     }
 };
 
-
-
-
 const loginHandle = async (req, res) => {
     const { email, password } = req.body;
 

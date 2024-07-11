@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import expressLayouts from "express-ejs-layouts";
@@ -10,23 +10,24 @@ import index from "./routes/indexRouter.js";
 import movieRouter from "./routes/movieRouter.js";
 import "./config/passportGoogle.js";
 import cors from "cors"
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 //Créer une application Express
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-}));
+
+const corsOptions = {
+  origin: 'http://localhost:4001',
+  credentials: true, 
+};
+
+app.use(cors(corsOptions));
 
 //------------ Passport Configuration ------------//
-// import configurePassport from './config/passport.js';
-// configurePassport(passport);
+import configurePassport from './config/passport.js';
+configurePassport(passport);
 
 //Configuration de mon application pour qu'elle puisse servir du contenu statique
 app.use(express.static('public'));
@@ -82,26 +83,34 @@ app.get(
 );
 
 // Call back route
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", {
-    access_type: "offline",
-    scope: ["email", "profile"],
-  }),
-  (req, res) => {
-    if (!req.user) {
-      res.status(400).json({ error: "Authentication failed" });
-    } else {
-      res.redirect('http://localhost:4001/');
-      //res.status(200).json({ user: req.user });
-    }
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Authentification réussie, rediriger vers la page d'accueil.
+    res.redirect('http://localhost:4001/');
+  });
+
+// Route de déconnexion
+app.get('/logout', async (req, res) => {
+  if (req.user && req.user.googleToken) {
+    const url = `https://accounts.google.com/o/oauth2/revoke?token=${req.user.googleToken}`;
+    await fetch(url, { method: 'POST' });
   }
-);
+
+  req.logout((err) => {
+    if (err) { return next(err); }
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid'); 
+      res.redirect('http://localhost:4001/');
+    });
+  });
+});
+
 
 //------------ Routes ------------//
 app.get("/", (req, res) => {
     res.render("index", {});
-});
+})
 
 app.use('/', index);
 app.use('/auth', auth);

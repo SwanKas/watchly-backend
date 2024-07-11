@@ -44,5 +44,14 @@ router.get('/logout', authController.logoutHandle);
 //------------ Google Auth Handle ------------//
 router.get('/auth/google/callback', authController.googleAuthHandle);
 
+router.get('/status', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.json({ isAuthenticated: true, user: req.user });
+    } else {
+        res.json({ isAuthenticated: false, user: null });
+    }
+});
+
+
 
 export default router;
