@@ -17,9 +17,16 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
-
+let websiteUrl;
+if (process.env.ENVIRONMENT === "PROD") {
+    websiteUrl = process.env.WEBSITE_URL_PROD;
+} else if (process.env.ENVIRONMENT === "DEV") {
+    websiteUrl = process.env.WEBSITE_URL_DEV;
+  } else {
+    websiteUrl = process.env.WEBSTIE_URL_DEFAULT;
+}
 const corsOptions = {
-  origin: 'http://localhost:4001',
+  origin: websiteUrl+":4001",
   credentials: true, 
 };
 
@@ -87,7 +94,7 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     // Authentification réussie, rediriger vers la page d'accueil.
-    res.redirect('http://localhost:4001/');
+    res.redirect(websiteUrl+":4001/");
   });
 
 // Route de déconnexion
@@ -101,7 +108,7 @@ app.get('/logout', async (req, res) => {
     if (err) { return next(err); }
     req.session.destroy(() => {
       res.clearCookie('connect.sid'); 
-      res.redirect('http://localhost:4001/');
+      res.redirect(websiteUrl+":4001/");
     });
   });
 });

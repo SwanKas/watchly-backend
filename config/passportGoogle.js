@@ -5,14 +5,22 @@ import dotenv from "dotenv";
 import User from "../models/User.js";
 
 dotenv.config();
-
+app.use(express.json());
+let websiteUrl;
+if (process.env.ENVIRONMENT === "PROD") {
+    websiteUrl = process.env.WEBSITE_URL_PROD;
+} else if (process.env.ENVIRONMENT === "DEV") {
+    websiteUrl = process.env.WEBSITE_URL_DEV;
+  } else {
+    websiteUrl = process.env.WEBSTIE_URL_DEFAULT;
+}
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID, // google client id
       clientSecret: process.env.GOOGLE_CLIENT_SECRET, // google client secret
       // the callback url added while creating the Google auth app on the console
-      callbackURL: "http://localhost:4000/auth/google/callback", 
+      callbackURL: websiteUrl+":4000/auth/google/callback", 
       passReqToCallback: true,
     },
 
