@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import User from "../models/User.js";
 
 dotenv.config();
-app.use(express.json());
 let websiteUrl;
 if (process.env.ENVIRONMENT === "PROD") {
     websiteUrl = process.env.WEBSITE_URL_PROD;
