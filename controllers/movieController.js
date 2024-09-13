@@ -10,7 +10,7 @@ try {
 
     // Récupérer les 100 premiers films
     for (let page = 1; page <= 5; page++) {
-        const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_}&language=fr-FR&page=${page}`);
+        const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&language=fr-FR&page=${page}`);
         movies.push(...response.data.results);
       }
      // Récupérer les 100 premières séries
