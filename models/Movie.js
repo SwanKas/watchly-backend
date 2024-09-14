@@ -33,20 +33,31 @@ const MovieSchema = new mongoose.Schema({
 
 //------------ Film Schema TMDB ------------//
 const MovieSchema = new mongoose.Schema({
+    tmdb_id: Number,
     title: String,
-    release_date: String,
-    vote_average: String,
-    vote_count: String,
+    release_date: Date,
+    vote_average: Number,
+    vote_count: Number,
     overview: String,
-    runtime: String,
+    runtime: Number,
     tagline: String,
     backdrop_path: String,
     poster_path: String,
-    genre: Array,
-    budget: String,
-    popularity: String,
-
-});     
+    genre: [String],
+    budget: Number,
+    popularity: Number,
+    url_trailer: String,
+    providers_id: [{
+      type: Map,
+      of: new mongoose.Schema({
+        types: {
+          flatrate: [Number],
+          rent: [Number],
+          buy: [Number]
+        }
+      }, { _id: false })
+    }]
+  });
 
 const Movie = mongoose.model('Movie', MovieSchema);
 
