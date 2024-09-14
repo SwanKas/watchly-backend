@@ -18,7 +18,7 @@ if (process.env.ENVIRONMENT === "PROD") {
 } else if (process.env.ENVIRONMENT === "DEV") {
     websiteUrl = process.env.WEBSITE_URL_DEV;
   } else {
-    websiteUrl = process.env.WEBSTIE_URL_DEFAULT;
+    websiteUrl = process.env.WEBSITE_URL_DEFAULT;
 }
 const registerHandle = async (req, res) => {
     const { name, email, password, confirmPassword } = req.body;
