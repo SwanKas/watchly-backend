@@ -2,8 +2,8 @@ import mongoose from 'mongoose';
 import axios from 'axios';
 import Movie from '../models/Movie.js';
 import Providers from '../models/Providers.js';
+import Genres from '../models/Genres.js';
 
-// Fonction pour vider les collections
 const clearTables = async (models) => {
   try {
     if (mongoose.connection.readyState !== 1) {
@@ -19,7 +19,6 @@ const clearTables = async (models) => {
   }
 };
 
-// Fonction pour obtenir l'URL du trailer d'un film
 const getMovieTrailer = async (movieId, moovieName) => {
   const url = `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${process.env.TMDB_API_KEY}`;
   try {
@@ -29,10 +28,10 @@ const getMovieTrailer = async (movieId, moovieName) => {
       const trailer = videos.find(video => video.type === "Trailer" && video.site === "YouTube");
       if (trailer) {
         const trailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
-        console.log('Trailer found for: ' + moovieName);
+        console.log('Trailer found for: "' + moovieName+'"');
         return trailerUrl;
       } else {
-        console.log('Trailer NOT found for: ' + moovieName);
+        console.log('Trailer NOT found for: "' + moovieName+'"');
         return null;
       }
     }
@@ -41,17 +40,15 @@ const getMovieTrailer = async (movieId, moovieName) => {
   }
 };
 
-// Fonction pour récupérer et sauvegarder les providers
 const fetchProvidersAndSave = async (movieId) => {
   try {
     const url = `https://api.themoviedb.org/3/movie/${movieId}/watch/providers?api_key=${process.env.TMDB_API_KEY}`;
     const response = await axios.get(url);
     const providersData = response.data.results;
-    const regions = ['FR', 'US', 'GB']; // Exemples de pays
+    const regions = ['FR', 'US', 'GB']; // Providers country to get from api
 
     const providersByCountry = [];
 
-    // Parcourir les régions pour récupérer les informations de provider
     for (const region of regions) {
       if (providersData[region]) {
         const providerInfo = providersData[region];
@@ -61,30 +58,26 @@ const fetchProvidersAndSave = async (movieId) => {
           buy: []
         };
 
-        // Collecter les informations par type : flatrate, rent, buy
         ['flatrate', 'rent', 'buy'].forEach(type => {
           if (providerInfo[type]) {
-            providerInfo[type].forEach(async (provider) => { // Marquer comme `async` pour pouvoir utiliser `await` à l'intérieur
+            providerInfo[type].forEach(async (provider) => {
               providersByType[type].push(provider.provider_id);
 
-              // Vérifier si le provider existe déjà dans la collection Providers
               const existingProvider = await Providers.findOne({ id_providers: provider.provider_id, country_code: region });
               if (!existingProvider) {
-                // Sauvegarder le nouveau provider dans la collection Providers
                 const newProvider = new Providers({
                   id_providers: provider.provider_id,
                   name: provider.provider_name,
-                  url_providers_img: `https://image.tmdb.org/t/p/original${provider.logo_path}`, // Lien vers l'image du provider
+                  url_providers_img: `https://image.tmdb.org/t/p/original${provider.logo_path}`,
                   country_code: region,
                   type: type,
                 });
-                await newProvider.save(); // Sauvegarder en base
+                await newProvider.save();
               }
             });
           }
         });
 
-        // Ajouter les providers par pays dans la structure finale
         providersByCountry.push({
           [region]: {
             types: providersByType
@@ -93,31 +86,46 @@ const fetchProvidersAndSave = async (movieId) => {
       }
     }
 
-    return providersByCountry; // Retourner le tableau structuré avec pays en clé et types en valeur
+    return providersByCountry;
   } catch (error) {
     console.error('Error fetching providers:', error);
     return [];
   }
 };
 
-// Fonction pour récupérer les films et les séries, et les sauvegarder dans MongoDB
+const fetchAndSaveGenres = async () => {
+  const url = `https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.TMDB_API_KEY}`;
+  try {
+    const response = await axios.get(url);
+    const genresData = response.data.genres;
+    for (const genre of genresData) {
+      const newGenre = new Genres({
+        id_genres: genre.id,
+        name: genre.name
+      });
+      await newGenre.save();
+    }
+
+    console.log('Genres imported successfully!');
+  } catch (error) {
+    console.error('Error fetching and saving genres:', error);
+  }
+};
 const fetchMoviesAndSeries = async (req, res) => {
   try {
     const movies = [];
 
-    // Récupérer les 100 premiers films
+
     for (let page = 1; page <= 2; page++) {
       const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&language=fr-FR&page=${page}`);
       movies.push(...response.data.results);
     }
 
-    await clearTables([Movie, Providers]);
-
-    // Récupérer les films et ajouter le trailer et les providers
+    await clearTables([Movie, Providers, Genres]);
+    fetchAndSaveGenres();
     for (const film of movies) {
       const url_trailer = await getMovieTrailer(film.id, film.title);
       const providers_id = await fetchProvidersAndSave(film.id);
-
       const newMovie = new Movie({
         tmdb_id: film.id,
         title: film.title,
@@ -129,14 +137,14 @@ const fetchMoviesAndSeries = async (req, res) => {
         tagline: film.tagline,
         backdrop_path: film.backdrop_path,
         poster_path: film.poster_path,
-        genre: film.genres,
+        genre: film.genre_ids, 
         budget: film.budget,
         popularity: film.popularity,
         url_trailer: url_trailer,
-        providers_id: providers_id // Enregistrer l'objet des providers par type
+        providers_id: providers_id 
       });
 
-      await newMovie.save(); // Sauvegarder le film dans MongoDB
+      await newMovie.save();
     }
 
     res.status(200).json({ message: "Movies saved successfully!" });
