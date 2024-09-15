@@ -9,7 +9,7 @@ const fetchMovies = async (req, res) => {
     const type = "movie";
     console.log('Fetching movies from TMDB...');
     console.log('-------------------------------');
-    for (let page = 1; page <= 2; page++) {
+    for (let page = 1; page <= 20; page++) {
       const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&language=fr-FR&page=${page}`);
       movies.push(...response.data.results);
     }
@@ -65,5 +65,36 @@ const fetchMovies = async (req, res) => {
     res.status(500).json({ error: 'An error occurred.' });
   }
 };
+
+// Fonction pour récupérer les films depuis la base de données
+export const getMoviesFromDB = async (req, res) => {
+  try {
+    const movies = await Movie.find(); 
+    res.status(200).json(movies); 
+  } catch (error) {
+    console.error("Erreur lors de la récupération des films :", error);
+    res.status(500).json({ message: "Erreur lors de la récupération des films." });
+  }
+};
+
+// Fonction pour récupérer un film par son tmdb_id
+export const getMovieByTmdbId = async (req, res) => {
+  try {
+    const { id } = req.params; 
+
+    const movie = await Movie.findOne({ tmdb_id: id });
+
+    if (!movie) {
+      return res.status(404).json({ message: "Movie not found" });
+    }
+
+    res.status(200).json(movie);
+  } catch (error) {
+    console.error("Error fetching movie:", error);
+    res.status(500).json({ message: "Error fetching movie" });
+  }
+};
+
+
 
 export default fetchMovies;

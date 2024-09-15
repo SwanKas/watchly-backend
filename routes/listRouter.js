@@ -34,41 +34,13 @@ router.get("/", ensureAuthenticated, async (req, res) => {
   });
 
 
-// Route pour ajouter un film à une liste
-router.post('/:listId/movies', async (req, res) => {
-  const { listId } = req.params;
-  const { movie } = req.body; // L'objet film à ajouter
-  
-  if (!movie) {
-    return res.status(400).json({ message: "Le film est requis" });
-  }
-
-  try {
-    // Trouver la liste correspondante
-    const list = await List.findById(listId);
-    if (!list) {
-      return res.status(404).json({ message: "Liste non trouvée" });
+  router.post('/:listId/movies', async (req, res) => {
+    const { listId } = req.params;
+    const { movie } = req.body; // L'objet film à ajouter
+    
+    if (!movie || !movie.tmdb_id) {
+      return res.status(400).json({ message: "Le film est requis" });
     }
-
-    // Vérifier si le film est déjà dans la liste
-    const movieExists = list.movies.some((m) => m.id === movie.id);
-    if (movieExists) {
-      return res.status(400).json({ message: "Le film est déjà dans la liste" });
-    }
-
-    // Ajouter le film à la liste
-    list.movies.push(movie);
-    await list.save();
-
-    res.status(200).json(list);
-  } catch (error) {
-    res.status(500).json({ message: "Erreur lors de l'ajout du film à la liste", error });
-  }
-});
-
-// Route pour supprimer un film d'une liste
-router.delete('/:listId/movies/:movieId', ensureAuthenticated, async (req, res) => {
-    const { listId, movieId } = req.params;
   
     try {
       // Trouver la liste correspondante
@@ -77,16 +49,45 @@ router.delete('/:listId/movies/:movieId', ensureAuthenticated, async (req, res) 
         return res.status(404).json({ message: "Liste non trouvée" });
       }
   
-      // Supprimer le film de la liste
-      list.movies = list.movies.filter((movie) => movie.id !== parseInt(movieId));
+      // Vérifier si le film est déjà dans la liste
+      const movieExists = list.movies.some((m) => m.tmdb_id === movie.tmdb_id);
+      if (movieExists) {
+        return res.status(400).json({ message: "Le film est déjà dans la liste" });
+      }
   
+      // Ajouter le film à la liste
+      list.movies.push(movie);
       await list.save();
   
       res.status(200).json(list);
     } catch (error) {
-      res.status(500).json({ message: "Erreur lors de la suppression du film", error });
+      res.status(500).json({ message: "Erreur lors de l'ajout du film à la liste", error });
     }
   });
+  
+  
+
+// Route pour supprimer un film d'une liste
+router.delete('/:listId/movies/:movieId', ensureAuthenticated, async (req, res) => {
+  const { listId, movieId } = req.params;
+
+  try {
+    const list = await List.findById(listId);
+    if (!list) {
+      return res.status(404).json({ message: "Liste non trouvée" });
+    }
+
+    // Supprimer le film de la liste
+    list.movies = list.movies.filter((movie) => movie.tmdb_id !== parseInt(movieId));
+
+    await list.save();
+
+    res.status(200).json(list);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de la suppression du film", error });
+  }
+});
+
   
   // Route pour supprimer une liste
 router.delete('/:listId', ensureAuthenticated, async (req, res) => {

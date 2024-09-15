@@ -1,13 +1,12 @@
 import mongoose from 'mongoose';
 
 const movieSchema = new mongoose.Schema({
-  id: Number,
+  tmdb_id: Number,
   title: String,
-  poster: String,
-  year: String,
-  rating: Number,
-  description: String,
-  type: String
+  poster_path: String, // Poster du film
+  release_date: Date,  // Date de sortie du film
+  vote_average: Number, // Note IMDB
+  overview: String, // Description ou synopsis du film
 });
 
 const listSchema = new mongoose.Schema({
