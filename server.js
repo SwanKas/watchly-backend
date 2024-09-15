@@ -10,6 +10,8 @@ import cors from "cors";
 import authRouter from "./routes/authRouter.js";
 import index from "./routes/indexRouter.js";
 import movieRouter from "./routes/movieRouter.js";
+import serieRouter from "./routes/serieRouter.js";
+import genresRouter from "./routes/genresRouter.js";
 import commentRouter from "./routes/commentRouter.js";
 import configurePassport from "./config/passport.js";
 import { testConnection, searchMovies } from "./config/elasticsearch.js";
@@ -138,6 +140,8 @@ app.get("/", (req, res) => {
 
 app.use("/", index);
 app.use("/", movieRouter);
+app.use("/", serieRouter);
+app.use("/", genresRouter);
 app.use("/auth", authRouter);
 
 // Ecoute du serveur sur le port 4000
