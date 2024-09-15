@@ -14,6 +14,7 @@ import commentRouter from "./routes/commentRouter.js";
 import configurePassport from "./config/passport.js";
 import { testConnection, searchMovies } from "./config/elasticsearch.js";
 import "./config/passportGoogle.js"; // Assurez-vous que ce fichier est importé
+import listRouter from "./routes/listRouter.js";
 
 // Connexion à ElasticSearch
 testConnection(); // Teste la connexion à ElasticSearch au démarrage
@@ -139,6 +140,7 @@ app.get("/", (req, res) => {
 app.use("/", index);
 app.use("/", movieRouter);
 app.use("/auth", authRouter);
+app.use("/api/lists", listRouter);
 
 // Ecoute du serveur sur le port 4000
 const start = async () => {
