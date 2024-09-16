@@ -106,7 +106,7 @@ const activateHandle = async (req, res) => {
 
     if (!token) {
         req.flash('error_msg', "Erreur d'activation du compte !");
-        return res.redirect(websiteUrl+":4001");
+        return res.redirect("http://localhost"+":4001");
     }
 
     try {
@@ -116,7 +116,7 @@ const activateHandle = async (req, res) => {
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
             req.flash('error_msg', "Email déjà enregistré ! Veuillez vous connecter.");
-            return res.redirect(websiteUrl+":4001");
+            return res.redirect("http://localhost"+":4001");
         }
 
         const newUser = new User({ name, email, password });
@@ -126,7 +126,7 @@ const activateHandle = async (req, res) => {
         await newUser.save();
 
         req.flash('success_msg', "Compte activé. Vous pouvez maintenant vous connecter.");
-        return res.redirect(websiteUrl+":4001");
+        return res.redirect("http://localhost"+":4001");
 
     } catch (err) {
         console.log(err);
@@ -171,7 +171,7 @@ const forgotPassword = async (req, res) => {
         const accessToken = oauth2Client.getAccessToken()
 
         const token = jwt.sign({ _id: user._id }, JWT_RESET_KEY, { expiresIn: '30m' });
-        const resetLink = websiteUrl+`:4001/reset-password/${token}`; 
+        const resetLink = "http://localhost"+`:4001/reset-password/${token}`; 
 
         await User.updateOne({ resetLink });
 
