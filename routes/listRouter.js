@@ -15,7 +15,7 @@ router.post("/", ensureAuthenticated, async (req, res) => {
   try {
     const newList = new List({
       name: name.trim(),
-      userId: req.user._id, // Utilisation de l'ID de l'utilisateur authentifié
+      userId: req.user._id, 
     });
     await newList.save();
     res.status(201).json(newList);
@@ -36,26 +36,22 @@ router.get("/", ensureAuthenticated, async (req, res) => {
 
   router.post('/:listId/movies', async (req, res) => {
     const { listId } = req.params;
-    const { movie } = req.body; // L'objet film à ajouter
+    const { movie } = req.body; 
     
     if (!movie || !movie.tmdb_id) {
       return res.status(400).json({ message: "Le film est requis" });
     }
   
     try {
-      // Trouver la liste correspondante
       const list = await List.findById(listId);
       if (!list) {
         return res.status(404).json({ message: "Liste non trouvée" });
       }
-  
-      // Vérifier si le film est déjà dans la liste
       const movieExists = list.movies.some((m) => m.tmdb_id === movie.tmdb_id);
       if (movieExists) {
         return res.status(400).json({ message: "Le film est déjà dans la liste" });
       }
   
-      // Ajouter le film à la liste
       list.movies.push(movie);
       await list.save();
   
@@ -98,7 +94,6 @@ router.delete('/:listId', ensureAuthenticated, async (req, res) => {
       if (!list) {
         return res.status(404).json({ message: "Liste non trouvée" });
       }
-  
       await List.findByIdAndDelete(listId);
       res.status(200).json({ message: "Liste supprimée avec succès" });
     } catch (error) {

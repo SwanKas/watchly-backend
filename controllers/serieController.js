@@ -71,29 +71,33 @@ const fetchSeries = async (req, res) => {
     }
 };
 
-// Fonction pour récupérer les séries depuis la base de données
+// Fonction pour récupérer toutes les séries depuis la base de données
 export const getSeriesFromDB = async (req, res) => {
-    try {
-      const series = await Serie.find(); 
-      res.status(200).json(series); 
-    } catch (error) {
-      console.error("Erreur lors de la récupération des séries :", error);
-      res.status(500).json({ message: "Erreur lors de la récupération des séries." });
-    }
-  };
+  try {
+    const series = await Serie.find(); // Récupérer toutes les séries
+    res.status(200).json(series); // Retourner les séries en JSON
+  } catch (error) {
+    console.error("Erreur lors de la récupération des séries :", error);
+    res.status(500).json({ message: "Erreur lors de la récupération des séries." });
+  }
+};
 
-  // Fonction pour obtenir une série par ID
-export const getSerieById = async (req, res) => {
-    try {
-      const serie = await Serie.findById(req.params.id); // Rechercher la série par son ID
-      if (!serie) {
-        return res.status(404).json({ message: "Serie not found" });
-      }
-      res.status(200).json(serie); // Retourner la série en réponse
-    } catch (error) {
-      console.error("Error fetching serie by ID:", error);
-      res.status(500).json({ message: "Error fetching serie" });
+// Fonction pour récupérer une série par son tmdb_id
+export const getSerieByTmdbId = async (req, res) => {
+  try {
+    const { id } = req.params; 
+
+    const serie = await Serie.findOne({ tmdb_id: id });  
+
+    if (!serie) {
+      return res.status(404).json({ message: "Série non trouvée" });
     }
-  };
+
+    res.status(200).json(serie);
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la série :", error);
+    res.status(500).json({ message: "Erreur lors de la récupération de la série." });
+  }
+};
 
 export default fetchSeries;
