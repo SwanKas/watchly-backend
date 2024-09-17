@@ -21,7 +21,6 @@ const fetchMovies = async (req, res) => {
     console.log('Database cleared.');
     console.log('-------------------------------');
 
-
     for (const film of movies) {
       console.log(`Processing: ${film.title}`);
       console.log('-------------------------------');
@@ -33,8 +32,9 @@ const fetchMovies = async (req, res) => {
         console.log(`No trailer found for: "${film.title}"`);
       }
 
+      const providersData = await utils.fetchProvidersAndSave(film.id, type);
+      const providers_id = Object.values(providersData.US.types).flat(); // Transformation ici
 
-      const providers_id = await utils.fetchProvidersAndSave(film.id, type);
       const newMovie = new Movie({
         tmdb_id: film.id,
         title: film.title,
@@ -77,24 +77,50 @@ export const getMoviesFromDB = async (req, res) => {
   }
 };
 
-// Fonction pour récupérer un film par son tmdb_id
 export const getMovieByTmdbId = async (req, res) => {
   try {
-    const { id } = req.params; 
+    const { id } = req.params;
 
-    const movie = await Movie.findOne({ tmdb_id: id });
+    const movie = await Movie.aggregate([
+      { $match: { tmdb_id: parseInt(id) } },
+      {
+        $lookup: {
+          from: 'providers', // Nom de la collection
+          localField: 'providers_id', // IDs des providers dans Movie
+          foreignField: 'id_providers', // IDs des providers dans Providers
+          as: 'platforms' // Alias pour les résultats
+        }
+      },
+      {
+        $project: {
+          tmdb_id: 1,
+          title: 1,
+          release_date: 1,
+          vote_average: 1,
+          vote_count: 1,
+          overview: 1,
+          runtime: 1,
+          tagline: 1,
+          backdrop_path: 1,
+          poster_path: 1,
+          genre: 1,
+          popularity: 1,
+          url_trailer: 1,
+          'platforms.name': 1, // Inclure le nom de la plateforme
+          'platforms.url_providers_img': 1 // Inclure le logo de la plateforme
+        }
+      }
+    ]);
 
-    if (!movie) {
+    if (!movie || movie.length === 0) {
       return res.status(404).json({ message: "Movie not found" });
     }
 
-    res.status(200).json(movie);
+    res.status(200).json(movie[0]); // Retourne les résultats
   } catch (error) {
     console.error("Error fetching movie:", error);
     res.status(500).json({ message: "Error fetching movie" });
   }
 };
 
-
-
-export default fetchMovies;
+ export default fetchMovies;  
