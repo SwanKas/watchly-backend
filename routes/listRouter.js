@@ -146,4 +146,25 @@ router.delete('/:listId', ensureAuthenticated, async (req, res) => {
   }
 });
 
+// Route pour mettre à jour une liste par son ID
+router.put('/:listId', ensureAuthenticated, async (req, res) => {
+  const { listId } = req.params;
+  const { name } = req.body; 
+
+  try {
+    const updatedList = await List.findByIdAndUpdate(
+      listId,
+      { name: name }, 
+      { new: true } 
+    );
+    if (!updatedList) {
+      return res.status(404).json({ message: 'Liste non trouvée' });
+    }
+
+    return res.status(200).json({ message: 'Liste mise à jour avec succès', list: updatedList });
+  } catch (error) {
+    return res.status(500).json({ message: 'Erreur lors de la mise à jour de la liste', error });
+  }
+});
+
 export default router;
