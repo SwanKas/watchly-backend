@@ -36,7 +36,7 @@ if (process.env.ENVIRONMENT === "PROD") {
 }
 
 const corsOptions = {
-  origin: 'http://localhost:4001',
+  origin: websiteUrl+':4001',
   credentials: true,
   optionsSuccessStatus: 200
 };
