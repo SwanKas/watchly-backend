@@ -13,12 +13,12 @@ const JWT_RESET_KEY = "jwtreset987";
 //------------ User Model ------------//
 import User from '../models/User.js';
 let websiteUrl;
-if (process.env.ENVIRONMENT === "PROD") {
-    websiteUrl = process.env.WEBSITE_URL_PROD;
-} else if (process.env.ENVIRONMENT === "DEV") {
-    websiteUrl = process.env.WEBSITE_URL_DEV;
+if (process.env.REACT_APP_ENVIRONMENT === "PROD") {
+    websiteUrl = process.env.BACKEND_WEBSITE_URL_PROD;
+} else if (process.env.REACT_APP_ENVIRONMENT === "DEV") {
+    websiteUrl = process.env.BACKEND_WEBSITE_URL_DEFAULT;
   } else {
-    websiteUrl = process.env.WEBSITE_URL_DEFAULT;
+    websiteUrl = process.env.BACKEND_WEBSITE_URL_DEFAULT;
 }
 const registerHandle = async (req, res) => {
     const { name, email, password, confirmPassword } = req.body;
@@ -171,7 +171,7 @@ const forgotPassword = async (req, res) => {
         const accessToken = oauth2Client.getAccessToken()
 
         const token = jwt.sign({ _id: user._id }, JWT_RESET_KEY, { expiresIn: '30m' });
-        const resetLink = "http://localhost"+`:4001/reset-password/${token}`; 
+        const resetLink = websiteUrl+`/reset-password/${token}`; 
 
         await User.updateOne({ resetLink });
 

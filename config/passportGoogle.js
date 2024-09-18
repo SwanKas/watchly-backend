@@ -6,12 +6,12 @@ import User from "../models/User.js";
 dotenv.config();
 
 let websiteUrl;
-if (process.env.ENVIRONMENT === "PROD") {
-    websiteUrl = process.env.WEBSITE_URL_PROD;
-} else if (process.env.ENVIRONMENT === "DEV") {
-    websiteUrl = process.env.WEBSITE_URL_DEV;
+if (process.env.REACT_APP_ENVIRONMENT === "PROD") {
+    websiteUrl = process.env.BACKEND_WEBSITE_URL_PROD;
+} else if (process.env.REACT_APP_ENVIRONMENT === "DEV") {
+    websiteUrl = process.env.BACKEND_WEBSITE_URL_DEFAULT;
 } else {
-    websiteUrl = process.env.WEBSITE_URL_DEFAULT;
+    websiteUrl = process.env.BACKEND_WEBSITE_URL_DEFAULT;
 }
 
 passport.use(
@@ -19,7 +19,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost"+":4000/auth/google/callback",
+      callbackURL: websiteUrl + "/auth/google/callback",
       passReqToCallback: true,
     },
     async function (req, accessToken, refreshToken, profile, done) {

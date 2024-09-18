@@ -27,16 +27,16 @@ const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
 let websiteUrl;
-if (process.env.ENVIRONMENT === "PROD") {
-  websiteUrl = process.env.WEBSITE_URL_PROD;
-} else if (process.env.ENVIRONMENT === "DEV") {
-  websiteUrl = process.env.WEBSITE_URL_DEV;
+if (process.env.REACT_APP_ENVIRONMENT === "PROD") {
+  websiteUrl = process.env.BACKEND_WEBSITE_URL_PROD;
+} else if (process.env.REACT_APP_ENVIRONMENT === "DEV") {
+  websiteUrl = process.env.BACKEND_WEBSITE_URL_DEFAULT;
 } else {
-  websiteUrl = process.env.WEBSITE_URL_DEFAULT;
+  websiteUrl = process.env.BACKEND_WEBSITE_URL_DEFAULT;
 }
 
 const corsOptions = {
-  origin: websiteUrl+':4001',
+  origin: websiteUrl,
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -112,7 +112,7 @@ app.get(
   passport.authenticate("google", { failureRedirect: "/login" }),
   function (req, res) {
     // Authentification réussie, rediriger vers la page d'accueil.
-    res.redirect(websiteUrl + ":4001/");
+    res.redirect(websiteUrl + "/");
   }
 );
 
@@ -129,7 +129,7 @@ app.get("/logout", async (req, res) => {
     }
     req.session.destroy(() => {
       res.clearCookie("connect.sid");
-      res.redirect(websiteUrl + ":4001/");
+      res.redirect(websiteUrl + "/");
     });
   });
 });
