@@ -33,7 +33,8 @@ const MovieSchema = new mongoose.Schema({
 
 //------------ Film Schema TMDB ------------//
 const MovieSchema = new mongoose.Schema({
-    tmdb_id: Number,
+    // tmdb_id: Number,
+    tmdb_id: { type: Number, required: true },
     title: String,
     release_date: Date,
     vote_average: Number,
