@@ -29,6 +29,6 @@ const SerieSchema = new mongoose.Schema({
 
 });
 
-const Serie = mongoose.model('SerieTESTSWAN', SerieSchema);
+const Serie = mongoose.model('Serie', SerieSchema);
 
 export default Serie;
