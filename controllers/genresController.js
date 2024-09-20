@@ -4,7 +4,7 @@ import Genres from '../models/Genres.js';
 import * as utils from '../utils/importDataUtils.js'; 
 
 
-const fetchAndSaveGenres = async (req, res) =>{
+export const fetchAndSaveGenres = async (req, res) =>{
     utils.clearTables([Genres]);
     const url = `https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.TMDB_API_KEY}`;
     try {
@@ -24,5 +24,12 @@ const fetchAndSaveGenres = async (req, res) =>{
         console.error('Error fetching and saving genres:', error);
     }
 };
-
-export default fetchAndSaveGenres;
+export const getGenres = async (req, res) => {
+    try {
+        const genres = await Genres.find({}, 'id_genres name'); // Récupère uniquement id_genres et name
+        res.status(200).json(genres); // Renvoie le tableau des genres
+    } catch (error) {
+        console.error('Error retrieving genres:', error);
+        res.status(500).json({ message: "Error retrieving genres" });
+    }
+};
