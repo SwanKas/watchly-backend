@@ -14,7 +14,7 @@ import serieRouter from "./routes/serieRouter.js";
 import genresRouter from "./routes/genresRouter.js";
 import commentRouter from "./routes/commentRouter.js";
 import configurePassport from "./config/passport.js";
-import { testConnection, searchMovies } from "./config/elasticsearch.js";
+import { testConnection, searchMovies, searchSeries } from "./config/elasticsearch.js";
 import "./config/passportGoogle.js"; // Assurez-vous que ce fichier est importé
 import listRouter from "./routes/listRouter.js";
 
@@ -134,6 +134,24 @@ app.get("/logout", async (req, res) => {
   });
 });
 
+app.get('/search/movies', async (req, res) => {
+  const query = req.query.query;
+  try {
+    const results = await searchMovies(query);
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+app.get('/search/series', async (req, res) => {
+  const query = req.query.query;
+  try {
+    const results = await searchSeries(query);
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 //------------ Routes ------------//
 app.get("/", (req, res) => {
   res.render("index", {});

@@ -1,33 +1,28 @@
-import { Client } from "@elastic/elasticsearch";
-import dotenv from "dotenv"; // Assure-toi d'importer dotenv ici
 import { MongoClient } from "mongodb";
+import { Client } from "@elastic/elasticsearch";
+import dotenv from "dotenv";
 
-// Charger les variables d'environnement depuis le fichier .env
 dotenv.config();
+
 const mongoClient = new MongoClient(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-console.log("test");
-console.log(mongoClient);
-// Configurer le client ElasticSearch
+
 const esClient = new Client({
-  node: process.env.ELASTICSEARCH_URL, // URL d'ElasticSearch
+  node: process.env.ELASTICSEARCH_URL,
   auth: {
-    apiKey: process.env.ELASTICSEARCH_API_KEY, // Clé API
+    apiKey: process.env.ELASTICSEARCH_API_KEY,
   },
 });
 
 export const testConnection = async () => {
-  console.log("Tentative de connexion à ElasticSearch..."); // Log pour voir si la fonction est bien appelée
+  console.log("Tentative de connexion à ElasticSearch...");
   try {
     const response = await esClient.info();
     console.log("ElasticSearch connected:", response);
   } catch (error) {
-    console.error(
-      "Erreur lors de la connexion à ElasticSearch:",
-      error.message
-    );
+    console.error("Erreur lors de la connexion à ElasticSearch:", error.message);
   }
 };
 
@@ -80,6 +75,7 @@ export const syncMoviesData = async () => {
   }
 };
 
+
 export const syncSeriesData = async () => {
   try {
     await mongoClient.connect();
@@ -105,16 +101,73 @@ export const syncSeriesData = async () => {
   }
 };
 
-// Fonction pour rechercher des films dans l'index 'movies'
 export const searchMovies = async (query) => {
+  if (!query) {
+    throw new Error("Query is required");
+  }
+
+  const sanitizedQuery = query.trim();
+
   try {
-    const searchResult = await client.search({
+    const searchResult = await esClient.search({
       index: "movies",
-      q: query,
+      body: {
+        query: {
+          match_phrase_prefix: {
+            title: {
+              query: sanitizedQuery,
+              max_expansions: 10 
+            }
+          }
+        }
+      }
     });
-    return searchResult.hits.hits; // Retourne les résultats trouvés
+    return searchResult.hits.hits;
   } catch (error) {
     console.error("Error searching movies:", error);
-    throw error; // Propager l'erreur pour qu'elle soit gérée dans le serveur
+    throw error;
   }
 };
+
+
+
+export const searchSeries = async (query) => {
+  if (!query) {
+    throw new Error("Query is required");
+  }
+
+  const sanitizedQuery = query.trim();
+
+  try {
+    const searchResult = await esClient.search({
+      index: "series",
+      body: {
+        query: {
+          match_phrase_prefix: {
+            title: {
+              query: sanitizedQuery,
+              max_expansions: 10
+            }
+          }
+        }
+      }
+    });
+    return searchResult.hits.hits;
+  } catch (error) {
+    console.error("Error searching series:", error);
+    throw error;
+  }
+};
+
+
+
+// Exécuter la suppression, la création de l'index et la synchronisation des données
+(async () => {
+  await deleteIndex('movies');
+  await createIndex('movies');
+  await syncMoviesData();
+
+  await deleteIndex('series');
+  await createIndex('series');
+  await syncSeriesData();
+})();
