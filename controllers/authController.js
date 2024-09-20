@@ -278,26 +278,34 @@ const resetPassword = async (req, res) => {
     }
 };
 
-const loginHandle = async (req, res) => {
+const loginHandle = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
         const user = await User.findOne({ email });
 
         if (!user) {
+            console.log('User not found');
             return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect.' });
         }
 
         const isMatch = await bcryptjs.compare(password, user.password);
 
         if (!isMatch) {
+            console.log('Password does not match');
             return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect.' });
         }
 
-        req.session.user = user;
-        return res.status(200).json({ success: true, message: 'Connexion réussie.', user });
+        req.logIn(user, (err) => {
+            if (err) {
+                console.error('Error logging in:', err);
+                return next(err);
+            }
+            console.log('Login successful');
+            return res.status(200).json({ success: true, message: 'Connexion réussie.', user });
+        });
     } catch (err) {
-        console.error(err.message);
+        console.error('Server error:', err.message);
         return res.status(500).json({ success: false, message: 'Erreur du serveur. Veuillez réessayer plus tard.' });
     }
 };

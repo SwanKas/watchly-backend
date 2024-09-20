@@ -17,13 +17,15 @@ import configurePassport from "./config/passport.js";
 import { testConnection, searchMovies, searchSeries } from "./config/elasticsearch.js";
 import "./config/passportGoogle.js"; // Assurez-vous que ce fichier est importé
 import listRouter from "./routes/listRouter.js";
+import MongoStore from 'connect-mongo';
+
 
 // Connexion à ElasticSearch
-testConnection(); // Teste la connexion à ElasticSearch au démarrage
+testConnection(); // Teste la connexion à ElasticSearch au  
 
-// Créer une application Express
 const app = express();
 const PORT = process.env.PORT || 4000;
+
 
 app.use(express.json());
 let websiteUrl;
@@ -36,11 +38,10 @@ if (process.env.ENVIRONMENT === "PROD") {
 }
 
 const corsOptions = {
-  origin: websiteUrl+':4001',
+  origin: websiteUrl + ':4001',
   credentials: true,
   optionsSuccessStatus: 200
 };
-
 app.use(cors(corsOptions));
 
 //------------ Bodyparser Configuration ------------//
@@ -52,6 +53,8 @@ app.use(
     secret: process.env.SESSION_SECRET, // session secret
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }), // Utilisez MongoStore pour persister les sessions
+    cookie: { maxAge: 180 * 60 * 1000 } // 3 heures
   })
 );
 
