@@ -159,15 +159,13 @@ export const searchSeries = async (query) => {
   }
 };
 
-
-
 // Exécuter la suppression, la création de l'index et la synchronisation des données
-(async () => {
-  await deleteIndex('movies');
-  await createIndex('movies');
-  await syncMoviesData();
+// (async () => {
+//   await deleteIndex('movies');
+//   await createIndex('movies');
+//   await syncMoviesData();
 
-  await deleteIndex('series');
-  await createIndex('series');
-  await syncSeriesData();
-})();
+//   await deleteIndex('series');
+//   await createIndex('series');
+//   await syncSeriesData();
+// })();

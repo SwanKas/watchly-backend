@@ -307,7 +307,9 @@ const loginHandle = async (req, res) => {
 const logoutHandle = (req, res) => {
     req.logout(() => {
         req.flash('success_msg', 'You are logged out');
-        res.redirect('/auth/login');
+        //La variable d'environnement ne fonctionne pas ici, donc j'ai utilisé une URL statique pour le moment
+        res.redirect('http://localhost:4001');
+        //return res.redirect(websiteUrl+":4001");
     });
 }
 //------------ Google OAuth Callback ------------//

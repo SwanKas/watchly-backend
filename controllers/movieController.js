@@ -9,7 +9,7 @@ const fetchMovies = async (req, res) => {
     const type = "movie";
     console.log('Fetching movies from TMDB...');
     console.log('-------------------------------');
-    for (let page = 1; page <= 2; page++) {
+    for (let page = 1; page <= 20; page++) {
       const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&language=fr-FR&page=${page}`);
       movies.push(...response.data.results);
     }

@@ -11,7 +11,7 @@ const fetchSeries = async (req, res) => {
         console.log('Fetching series from TMDB...');
         console.log('-------------------------------');
 
-        for (let page = 1; page <= 2; page++) {
+        for (let page = 1; page <= 20; page++) {
             const response = await axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${process.env.TMDB_API_KEY}&language=fr-FR&page=${page}`);
             const filteredSeries = response.data.results.filter(serie =>
                 serie.original_language === 'en' || serie.original_language === 'fr'
