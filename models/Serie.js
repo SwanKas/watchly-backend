@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 
 const SerieSchema = new mongoose.Schema({
-    tmdb_id: Number,
+    tmdb_id: {
+      type: Number, // Numérique pour correspondre à l'ID TMDB
+      required: true,
+      unique: true,
+    },
     title: String,
     release_date: Date,
     vote_average: Number,
@@ -13,18 +17,18 @@ const SerieSchema = new mongoose.Schema({
     popularity: Number,
     url_trailer: String,
     providers_id: [{
-        type: Map,
-        of: new mongoose.Schema({
-          types: {
-            flatrate: [Number],
-            rent: [Number],
-            buy: [Number]
-          }
-        }, { _id: false })
-      }]
+      type: Map,
+      of: new mongoose.Schema({
+        types: {
+          flatrate: [String],
+          rent: [String],
+          buy: [String]
+        }
+      }, { _id: false })
+    }]
 
 });
 
-const Serie = mongoose.model('Serie', SerieSchema);
+const Serie = mongoose.model('SerieTESTSWAN', SerieSchema);
 
 export default Serie;

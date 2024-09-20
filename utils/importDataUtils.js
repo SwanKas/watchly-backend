@@ -1,6 +1,7 @@
 // utils/filmUtils.js
 import axios from 'axios';
 import Providers from '../models/Providers.js';
+import Movie from '../models/Movie.js';
 import mongoose from 'mongoose';
 
 // Fonction pour obtenir les fournisseurs et les sauvegarder
@@ -18,56 +19,41 @@ export const clearTables = async (models) => {
         console.error('Error clearing collections:', error);
     }
 };
-export const fetchProvidersAndSave = async (productId, type) => {
-    try {
-      const url = `https://api.themoviedb.org/3/${type}/${productId}/watch/providers?api_key=${process.env.TMDB_API_KEY}`;
-      const response = await axios.get(url);
-      const providersData = response.data.results;
-      const regions = ['FR', 'US', 'GB']; // Providers country to get from api
-  
-      const providersByCountry = [];
-  
-      for (const region of regions) {
-        if (providersData[region]) {
-          const providerInfo = providersData[region];
-          const providersByType = {
-            flatrate: [],
-            rent: [],
-            buy: []
-          };
-  
-          ['flatrate', 'rent', 'buy'].forEach(type => {
-            if (providerInfo[type]) {
-              providerInfo[type].forEach(async (provider) => {
-                providersByType[type].push(provider.provider_id);
-  
-                const existingProvider = await Providers.findOne({ id_providers: provider.provider_id, country_code: region });
-                if (!existingProvider) {
-                  const newProvider = new Providers({
-                    id_providers: provider.provider_id,
-                    name: provider.provider_name,
-                    url_providers_img: `https://image.tmdb.org/t/p/original${provider.logo_path}`,
-                    country_code: region,
-                    type: type,
-                  });
-                  await newProvider.save();
-                }
-              });
-            }
-          });
+export const fetchProvidersAndSave = async (tmdb_id) => {
+  try {
+    const url = `https://api.themoviedb.org/3/movie/${tmdb_id}/watch/providers?api_key=${process.env.TMDB_API_KEY}`;
+    const response = await axios.get(url);
+    const providersData = response.data.results;
 
-          providersByCountry.push({
-            [region]: {
-              types: providersByType
-            }
-          });
+    const providersForMovie = {
+      US: {
+        types: {
+          flatrate: providersData.US?.flatrate?.map((provider) => provider.provider_name) || [],
+          rent: providersData.US?.rent?.map((provider) => provider.provider_name) || [],
+          buy: providersData.US?.buy?.map((provider) => provider.provider_name) || []
+        }
+      },
+      UK: {
+        types: {
+          flatrate: providersData.GB?.flatrate?.map((provider) => provider.provider_name) || [],
+          rent: providersData.GB?.rent?.map((provider) => provider.provider_name) || [],
+          buy: providersData.GB?.buy?.map((provider) => provider.provider_name) || []
+        }
+      },
+      FR: {
+        types: {
+          flatrate: providersData.FR?.flatrate?.map((provider) => provider.provider_name) || [],
+          rent: providersData.FR?.rent?.map((provider) => provider.provider_name) || [],
+          buy: providersData.FR?.buy?.map((provider) => provider.provider_name) || []
         }
       }
-      return providersByCountry;
-    } catch (error) {
-      console.error('Error fetching providers:', error);
-      return [];
-    }
+    };
+
+    // Met à jour le film en utilisant `tmdb_id` comme champ de recherche
+    await Movie.findOneAndUpdate({ tmdb_id }, { providers_id: providersForMovie }, { new: true });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des providers:", error);
+  }
 };
 
 export const getProductTrailer = async (productId, productName, type) => {

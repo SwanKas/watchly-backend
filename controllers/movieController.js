@@ -23,6 +23,43 @@ const fetchMovies = async (req, res) => {
 
 
     for (const film of movies) {
+      const url = `https://api.themoviedb.org/3/movie/${film.id}/watch/providers?api_key=${process.env.TMDB_API_KEY}`;
+      const response = await axios.get(url);
+      
+      // Récupérer les providers pour FR, US et UK, ou null si non disponibles
+      const providersData = {
+        FR: response.data.results["FR"] || null,
+        US: response.data.results["US"] || null,
+        UK: response.data.results["GB"] || null
+      };
+      
+      // Exemple de traitement si tu veux récupérer les types pour chaque pays
+      const providersForMovie = {
+        FR: providersData.FR ? {
+          types: {
+            flatrate: providersData.FR.flatrate?.map((provider) => [provider.provider_name, "https://media.themoviedb.org/t/p/original"+provider.logo_path]) || [],
+            rent: providersData.FR.rent?.map((provider) => [provider.provider_name, provider.logo_path]) || [],
+            buy: providersData.FR.buy?.map((provider) =>[provider.provider_name, "https://media.themoviedb.org/t/p/original"+provider.logo_path]) || []
+          }
+        } : null,
+      
+        US: providersData.US ? {
+          types: {
+            flatrate: providersData.US.flatrate?.map((provider) => [provider.provider_name, "https://media.themoviedb.org/t/p/original"+provider.logo_path]) || [],
+            rent: providersData.US.rent?.map((provider) => [provider.provider_name, "https://media.themoviedb.org/t/p/original"+provider.logo_path]) || [],
+            buy: providersData.US.buy?.map((provider) =>[provider.provider_name, "https://media.themoviedb.org/t/p/original"+provider.logo_path]) || []
+          }
+        } : null,
+      
+        UK: providersData.UK ? {
+          types: {
+            flatrate: providersData.UK.flatrate?.map((provider) => [provider.provider_name, "https://media.themoviedb.org/t/p/original"+provider.logo_path]) || [],
+            rent: providersData.UK.rent?.map((provider) => [provider.provider_name, "https://media.themoviedb.org/t/p/original"+provider.logo_path]) || [],
+            buy: providersData.UK.buy?.map((provider) => [provider.provider_name, "https://media.themoviedb.org/t/p/original"+provider.logo_path]) || []
+          }
+        } : null
+      };
+            
       console.log(`Processing: ${film.title}`);
       console.log('-------------------------------');
 
@@ -34,7 +71,6 @@ const fetchMovies = async (req, res) => {
       }
 
 
-      const providers_id = await utils.fetchProvidersAndSave(film.id, type);
       const newMovie = new Movie({
         tmdb_id: film.id,
         title: film.title,
@@ -49,7 +85,7 @@ const fetchMovies = async (req, res) => {
         genre: film.genre_ids, 
         popularity: film.popularity,
         url_trailer: url_trailer,
-        providers_id: providers_id 
+        providers_id: providersForMovie
       });
 
       await newMovie.save();
