@@ -5,10 +5,10 @@ import { getMovieByTmdbId } from '../controllers/movieController.js';
 
 const router = express.Router();
 
-router.get("/fetch-movies", fetchMoviesAndSeries);
+router.get("api/fetch-movies", fetchMoviesAndSeries);
 
-router.get("/movies", getMoviesFromDB);
+router.get("api/movies", getMoviesFromDB);
 
-router.get('/movies/:id', getMovieByTmdbId);
+router.get('api/movies/:id', getMovieByTmdbId);
 
 export default router;
